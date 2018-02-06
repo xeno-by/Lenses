@@ -7,7 +7,7 @@ scalaVersion in ThisBuild := Scala211
 
 crossScalaVersions := Seq(Scala211, "2.10.7", "2.12.4", "2.13.0-M2")
 
-organization in ThisBuild := "com.thesamet.scalapb"
+organization in ThisBuild := "com.github.xenoby"
 
 scalacOptions in ThisBuild ++= {
   CrossVersion.partialVersion(scalaVersion.value) match {
@@ -48,8 +48,16 @@ lazy val lenses = crossProject(JSPlatform, JVMPlatform, NativePlatform).in(file(
   .settings(
     name := "lenses",
     libraryDependencies ++= Seq(
-      "com.lihaoyi" %%% "utest" % "0.6.3" % "test"
-    )
+      // "com.lihaoyi" %%% "utest" % "0.6.3" % "test"
+    ),
+    resolvers += "Sonatype staging" at "https://oss.sonatype.org/content/repositories/staging",
+    publishTo := Some("releases" at "https://oss.sonatype.org/service/local/staging/deploy/maven2"),
+    credentials ++= {
+      lazy val credentials = sys.props("credentials")
+      val credentialsFile = if (credentials != null) new File(credentials) else null
+      if (credentialsFile != null) List(new FileCredentials(credentialsFile))
+      else Nil
+    }
   )
   .jsSettings(
     scalacOptions += {
